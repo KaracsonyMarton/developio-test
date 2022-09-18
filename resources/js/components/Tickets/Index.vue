@@ -84,7 +84,7 @@ export default {
             this.getAllTickets.forEach((ticket) => {
                 filterValues.push(ticket.person_name);
             });
-            this.columns[1].filterOptions.filterDropdownItems = filterValues;
+            this.columns[1].filterOptions.filterDropdownItems = [...new Set(filterValues)];
         },
     },
 }

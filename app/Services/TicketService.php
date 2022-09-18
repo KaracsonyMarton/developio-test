@@ -6,8 +6,6 @@ use App\Interfaces\PersonRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Person;
 use App\Models\Ticket;
-use DateInterval;
-use DateTime;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -47,7 +45,7 @@ class TicketService
      */
     private function calculateDueDate(int $startHour, int $endHour): Carbon
     {
-        $dueDate = Carbon::now();
+        $dueDate = Carbon::now()->addDays(5)->setTime(10, 0, 0);
         if ($dueDate->isWeekend()) {
             $dueDate->next(Carbon::MONDAY)->addDay()->setTime($endHour, 0);
         } else {
@@ -60,6 +58,16 @@ class TicketService
             //If the due date is before 9am then add 1 day
             if ($dueDate->hour <= $startHour) {
                 $dueDate->addDays(1)->setTime($endHour, 0);
+            }
+
+            if ($dueDate->hour >= $startHour && $dueDate->hour <= $endHour) {
+                $hoursLeftFromToday = $endHour - $dueDate->hour; // How many hours left from today / 7 hours left
+                $hoursLeft = 16 - $hoursLeftFromToday; // 9 órám 16 óráig
+                if ($hoursLeft <= 8) {
+                    $dueDate->nextWeekday()->setTime($startHour + $hoursLeft, 0);
+                } else {
+                    $dueDate->nextWeekday()->addDay()->setTime(($startHour + $hoursLeft) - 8, 0);
+                }
             }
         }
         return $dueDate;
