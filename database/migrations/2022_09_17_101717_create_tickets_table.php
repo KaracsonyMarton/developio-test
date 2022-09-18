@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('subject');
             $table->string('message');
-            $table->date('due_date');
+            $table->dateTime('due_date');
             $table->timestamps();
 
             $table->unsignedBigInteger('person_id');
