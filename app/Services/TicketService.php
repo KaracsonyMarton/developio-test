@@ -34,58 +34,34 @@ class TicketService
         $newTicket->person_id = $person->id;
         $newTicket->subject = Arr::get($data, 'subject');
         $newTicket->message = Arr::get($data, 'message');
-        $newTicket->due_date = $this->calculateDueDate(16, 9, 17, true);
+        $newTicket->due_date = $this->calculateDueDate(9, 17);
         $ticket = $this->ticketRepository->create($newTicket);
         return (bool)$ticket;
     }
 
+
     /**
-     * @throws Exception
+     * @param int $startHour
+     * @param int $endHour
+     * @return Carbon
      */
-    function calculateDueDate($addtime, $dayStart, $dayEnd, $weekDaysOnly)
+    private function calculateDueDate(int $startHour, int $endHour): Carbon
     {
+        $dueDate = Carbon::now();
+        if ($dueDate->isWeekend()) {
+            $dueDate->next(Carbon::MONDAY)->addDay()->setTime($endHour, 0);
+        } else {
 
-        //Create required datetime objects and hours interval
-        $datetime = new DateTime('now');
-        $endofday = clone $datetime;
-        $endofday->setTime($dayEnd, 00); //set end of working day time
-
-
-        $interval = 'PT' . $addtime . 'H';
-
-        //Add hours onto initial given date
-        $datetime->add(new DateInterval($interval));
-
-        //if initial date + hours is after the end of working day
-        if ($datetime > $endofday) {
-            //get the difference between the initial date + interval and the end of working day in seconds
-            $seconds = $datetime->getTimestamp() - $endofday->getTimestamp();
-
-            //Loop to next day
-            while (true) {
-                $endofday->add(new DateInterval('PT24H'));//Loop to next day by adding 24hrs
-                $nextDay = $endofday->setTime($dayStart, 00);//Set day to working day start time
-                //If the next day is on a weekend and the week day only param is true continue to add days
-                if (in_array($nextDay->format('l'), array('Sunday', 'Saturday')) && $weekDaysOnly) {
-                    continue;
-                } else //If not a weekend
-                {
-                    $tmpDate = clone $nextDay;
-                    $tmpDate->setTime($dayEnd, 00);//clone the next day and set time to working day end time
-                    $nextDay->add(new DateInterval('PT' . $seconds . 'S')); //add the seconds onto the next day
-                    //if the next day time is later than the end of the working day continue loop
-                    if ($nextDay > $tmpDate) {
-                        $seconds = $nextDay->getTimestamp() - $tmpDate->getTimestamp();
-                        $endofday = clone $tmpDate;
-                        $endofday->setTime($dayStart, 00);
-
-                    } else //else return the new date.
-                    {
-                        return $endofday;
-                    }
-                }
+            //Calculate the due date based on  9am to 5pm
+            //If the due date is after 5pm then add 1 day
+            if ($dueDate->hour >= $endHour) {
+                $dueDate->addDays(2)->setTime($endHour, 0);
+            }
+            //If the due date is before 9am then add 1 day
+            if ($dueDate->hour <= $startHour) {
+                $dueDate->addDays(1)->setTime($endHour, 0);
             }
         }
-        return $datetime;
+        return $dueDate;
     }
 }
