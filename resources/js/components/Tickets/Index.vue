@@ -42,6 +42,12 @@ export default {
                 {
                     label: 'Név',
                     field: 'person_name',
+                    filterOptions: {
+                        enabled: true, // enable filter for this column
+                        placeholder: 'Szűrés', // placeholder for filter input
+                        filterDropdownItems: [], // dropdown (with selected values) instead of text input
+                        trigger: 'enter', //only trigger on enter not on keyup
+                    },
                 },
                 {
                     label: 'E-mail',
@@ -69,7 +75,17 @@ export default {
     async created() {
         await this.$store.dispatch("ticketsLoading", true)
         await this.$store.dispatch('fetchAllTickets')
+        this.getFilterValues();
         await this.$store.dispatch('ticketsLoading', false)
+    },
+    methods: {
+        getFilterValues() {
+            let filterValues = [];
+            this.getAllTickets.forEach((ticket) => {
+                filterValues.push(ticket.person_name);
+            });
+            this.columns[1].filterOptions.filterDropdownItems = filterValues;
+        },
     },
 }
 </script>

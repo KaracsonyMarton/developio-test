@@ -20,8 +20,8 @@
             </div>
             <div class="col-8">
                 <div class="text-end ml-auto">
-                    <a type="button" href="{{route('login')}}" class="btn btn-outline-light me-2">Login</a>
-                    <a type="button" href="{{route('register')}}" class="btn btn-warning">Sign-up</a>
+                    <a type="button" href="{{route('login')}}" class="btn btn-outline-light me-2">Bejelentkezés</a>
+                    <a type="button" href="{{route('register')}}" class="btn btn-warning">Regisztráció</a>
                 </div>
             </div>
         </div>

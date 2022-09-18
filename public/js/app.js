@@ -5441,7 +5441,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         field: 'id'
       }, {
         label: 'Név',
-        field: 'person_name'
+        field: 'person_name',
+        filterOptions: {
+          enabled: true,
+          // enable filter for this column
+          placeholder: 'Szűrés',
+          // placeholder for filter input
+          filterDropdownItems: [],
+          // dropdown (with selected values) instead of text input
+          trigger: 'enter' //only trigger on enter not on keyup
+
+        }
       }, {
         label: 'E-mail',
         field: 'person_email'
@@ -5476,16 +5486,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               return _this.$store.dispatch('fetchAllTickets');
 
             case 4:
-              _context.next = 6;
+              _this.getFilterValues();
+
+              _context.next = 7;
               return _this.$store.dispatch('ticketsLoading', false);
 
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
         }
       }, _callee);
     }))();
+  },
+  methods: {
+    getFilterValues: function getFilterValues() {
+      var filterValues = [];
+      this.getAllTickets.forEach(function (ticket) {
+        filterValues.push(ticket.person_name);
+      });
+      this.columns[1].filterOptions.filterDropdownItems = filterValues;
+    }
   }
 });
 
