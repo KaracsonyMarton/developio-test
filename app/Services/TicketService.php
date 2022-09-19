@@ -45,7 +45,7 @@ class TicketService
      */
     private function calculateDueDate(int $startHour, int $endHour): Carbon
     {
-        $dueDate = Carbon::now()->addDays(5)->setTime(10, 0, 0);
+        $dueDate = Carbon::now();
         if ($dueDate->isWeekend()) {
             $dueDate->next(Carbon::MONDAY)->addDay()->setTime($endHour, 0);
         } else {
